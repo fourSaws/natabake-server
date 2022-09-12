@@ -24,7 +24,7 @@ def getCart(request):
         serializer.is_valid()
         return Response(instance)
     else:
-        return Response({'getCart_ERROR:ID не найден'})
+        return Response({'getCart_ERROR:ID не найден'},status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -65,7 +65,7 @@ def editCart(request):
     try:
         _ = ModelCart.objects.filter(chat_id=chat_id).values('chat_id')[0]
     except IndexError:
-        return Response({'Exception': 'Chat ID does not Exist'})
+        return Response({'Exception': 'Chat ID does not Exist'},status=status.HTTP_404_NOT_FOUND)
     same_rec = ModelCart.objects.filter(chat_id=chat_id)
     if quantity_req == "0":
         _ = ModelCart.objects.filter(chat_id=chat_id).delete()
@@ -83,7 +83,7 @@ def editCart(request):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
         else:
-            return Response({'Exception': 'Data invalid'})
+            return Response({'Exception': 'Data invalid'},status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.data)
     else:
         a = same_rec[0]
@@ -95,7 +95,7 @@ def editCart(request):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
         else:
-            return Response({'Exception': 'Data invalid'})
+            return Response({'Exception': 'Data invalid'},status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.data)
 
 
@@ -115,7 +115,6 @@ def getProducts(request):
     if id:
         instance = ModelProduct.objects.filter(id=id).values()
         return Response(instance)
-
     if category:
         instance = ModelProduct.objects.filter(category=category).values()
         return Response(instance)
@@ -144,7 +143,7 @@ def addToCart(request):
     if serializer.is_valid(raise_exception=True):
         serializer.save()
     else:
-        return Response({'Exception': 'Data invalid'})
+        return Response({'Exception': 'Data invalid'},status=status.HTTP_404_NOT_FOUND)
     return Response(serializer.data)
 
 
