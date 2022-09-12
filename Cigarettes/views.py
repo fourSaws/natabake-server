@@ -1,6 +1,6 @@
 import openpyxl
 from django.shortcuts import render
-from rest_framework import status, generics
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -9,7 +9,7 @@ from django.shortcuts import redirect
 
 
 def mainPage(request):
-        return redirect('/admin/')
+    return redirect('/admin/')
 
 
 @api_view(['GET'])
@@ -24,7 +24,7 @@ def getCart(request):
         serializer.is_valid()
         return Response(instance)
     else:
-        return Response({'getCart_ERROR:ID не найден'})
+        return Response({'getCart_ERROR:ID не найден'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -32,6 +32,7 @@ def getCart(request):
 def getBrands(request):
     instance = ModelBrand.objects.all().values()
     return Response(instance)
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -65,7 +66,7 @@ def editCart(request):
     try:
         _ = ModelCart.objects.filter(chat_id=chat_id).values('chat_id')[0]
     except IndexError:
-        return Response({'Exception': 'Chat ID does not Exist'})
+        return Response({'Exception': 'Chat ID does not Exist'}, status=status.HTTP_404_NOT_FOUND)
     same_rec = ModelCart.objects.filter(chat_id=chat_id)
     if quantity_req == "0":
         _ = ModelCart.objects.filter(chat_id=chat_id).delete()
@@ -83,7 +84,7 @@ def editCart(request):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
         else:
-            return Response({'Exception': 'Data invalid'})
+            return Response({'Exception': 'Data invalid'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data)
     else:
         a = same_rec[0]
@@ -95,7 +96,7 @@ def editCart(request):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
         else:
-            return Response({'Exception': 'Data invalid'})
+            return Response({'Exception': 'Data invalid'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data)
 
 
@@ -115,10 +116,10 @@ def getProducts(request):
     if id:
         instance = ModelProduct.objects.filter(id=id).values()
         return Response(instance)
-
     if category:
         instance = ModelProduct.objects.filter(category=category).values()
         return Response(instance)
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -144,7 +145,7 @@ def addToCart(request):
     if serializer.is_valid(raise_exception=True):
         serializer.save()
     else:
-        return Response({'Exception': 'Data invalid'})
+        return Response({'Exception': 'Data invalid'}, status=status.HTTP_400_BAD_REQUEST)
     return Response(serializer.data)
 
 
@@ -193,7 +194,7 @@ def addItem(request):
                     current_volume = int(j)
                     break
                 current_brand += j + ' '
-            current_brand=ModelBrand.objects.get_or_create(name=current_brand)[0]
+            current_brand = ModelBrand.objects.get_or_create(name=current_brand)[0]
         if str(sheet['D' + str(i)].value).startswith("Одноразовая электронная сигарета"):
             sheet['D' + str(i)].value = sheet['D' + str(i)].value.replace('Одноразовая электронная сигарета', '')
             sheet['D' + str(i)].value = sheet['D' + str(i)].value.replace(current_brand.name, '')
