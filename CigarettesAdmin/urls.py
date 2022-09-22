@@ -27,8 +27,8 @@ urlpatterns = [
     path('api/addToCart',addToCart),
     path('api/addItem',addItem),
     path('api/getCategory',getCategory),
-    path('jet/', include('jet.urls', 'jet')),
-    path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
+    # path('jet/', include('jet.urls', 'jet')),
+    # path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
     #path('admin/', include(admin.site.urls))
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
