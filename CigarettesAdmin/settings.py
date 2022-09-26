@@ -25,14 +25,12 @@ SECRET_KEY = 'django-insecure-$6wa&b!^$hm%v+1-2+sfzr7&@a&p(h=eyj$m-tw94^pv&khauq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 # Application definition
 
 INSTALLED_APPS = [
     'Cigarettes',
-    'jet.dashboard',
-    'jet',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'django_filters',
     'django_cleanup.apps.CleanupConfig',
 
 ]
