@@ -69,7 +69,7 @@ def editCart(request):
         return Response({'Exception': 'Chat ID does not Exist'}, status=status.HTTP_404_NOT_FOUND)
     same_rec = ModelCart.objects.filter(chat_id=chat_id)
     if quantity_req == "0":
-        _ = ModelCart.objects.filter(chat_id=chat_id).delete()
+        _ = ModelCart.objects.filter(chat_id=chat_id).filter(id=product).delete()
         return Response({})
     if not same_rec.exists():
         try:
