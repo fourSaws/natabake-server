@@ -64,10 +64,10 @@ class ModelCart(models.Model):
 
 
 class ModelUser(models.Model):
-    chat_id = models.IntegerField(null=True,blank=True)
-    phone_number = models.CharField(max_length=11)
-    address = models.CharField(max_length=255)
-    comment = models.CharField(max_length=500)
+    chat_id = models.IntegerField(null=True,blank=True,verbose_name="Чат ID")
+    phone_number = models.CharField(max_length=11,verbose_name="Номер телефона")
+    address = models.CharField(max_length=255,verbose_name="Адрес")
+    comment = models.CharField(max_length=500,verbose_name="Комментарий")
 
 
     def __str__(self):

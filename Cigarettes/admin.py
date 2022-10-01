@@ -37,9 +37,12 @@ class CategoryAdmin(admin.ModelAdmin):
 class BrandAdmin(admin.ModelAdmin):
     list_display = ('id','name')
 
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('chat_id','phone_number','address','comment',)
+
 admin.site.register(ModelProduct, MainProduct)
 admin.site.register(ModelCart, MainCart)
 admin.site.register(ModelCategory,CategoryAdmin)
 admin.site.register(ModelBrand,BrandAdmin)
 
-admin.site.register(ModelUser)
+admin.site.register(ModelUser,UserAdmin)

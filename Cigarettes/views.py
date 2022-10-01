@@ -160,6 +160,22 @@ def getUser(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
+def createUser(request):
+    chat_id = request.query_params['chat_id']
+    phone_number = request.query_params['phone_number']
+    address = request.query_params['address']
+    comment = request.query_params['comment']
+    id_check =  ModelUser.objects.filter(chat_id=chat_id).values()
+    if not id_check.exists():
+        ModelUser.objects.create(chat_id=chat_id,address=address,phone_number=phone_number,comment=comment)
+        instance = ModelUser.objects.filter(chat_id=chat_id).values()
+        return Response(instance)
+    else:
+        ModelUser.objects.update(chat_id=chat_id,address=address,phone_number=phone_number,comment=comment)
+        instance = ModelUser.objects.filter(chat_id=chat_id).values()
+        return Response(instance)
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def addItem(request):
     CATEGORIES = {"Одноразовая электронная сигарета",
                   "Одноразовая POD-система",
