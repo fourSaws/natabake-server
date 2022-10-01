@@ -41,3 +41,5 @@ admin.site.register(ModelProduct, MainProduct)
 admin.site.register(ModelCart, MainCart)
 admin.site.register(ModelCategory,CategoryAdmin)
 admin.site.register(ModelBrand,BrandAdmin)
+
+admin.site.register(ModelUser)

@@ -61,3 +61,20 @@ class ModelCart(models.Model):
     class Meta:
         verbose_name = 'Корзина'
         verbose_name_plural = 'Корзина'
+
+
+class ModelUser(models.Model):
+    chat_id = models.IntegerField(null=True,blank=True)
+    phone_number = models.CharField(max_length=11)
+    address = models.CharField(max_length=255)
+    comment = models.CharField(max_length=500)
+
+
+    def __str__(self):
+        return f"{self.chat_id}"
+
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+
+

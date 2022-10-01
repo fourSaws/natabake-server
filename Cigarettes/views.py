@@ -149,6 +149,15 @@ def addToCart(request):
     return Response(serializer.data)
 
 
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def getUser(request):
+    chat_id = request.query_params['chat_id']
+    instance = ModelUser.objects.filter(chat_id=chat_id).values()
+    return Response(instance)
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def addItem(request):
