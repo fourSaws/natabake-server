@@ -32,6 +32,17 @@ class CartSerializer(serializers.ModelSerializer):
         fields = ('product', 'quantity', 'chat_id')
 
 
+# class UserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = ModelUser
+#         fields = ('__all__')
+
+class OrderSerializer(serializers.ModelSerializer):
+    client = serializers.SlugRelatedField(slug_field='chat_id',read_only=True)
+    class Meta:
+        model = ModelOrder
+        fields = ('client','cart','free_delivery','sum','address','status','comment')
+
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = ModelProduct

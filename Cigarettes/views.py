@@ -4,6 +4,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from Cigarettes.serializer import *
 from django.shortcuts import redirect
 
@@ -149,7 +151,6 @@ def addToCart(request):
     return Response(serializer.data)
 
 
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def getUser(request):
@@ -165,15 +166,47 @@ def createUser(request):
     phone_number = request.query_params['phone_number']
     address = request.query_params['address']
     comment = request.query_params['comment']
-    id_check =  ModelUser.objects.filter(chat_id=chat_id).values()
+    id_check = ModelUser.objects.filter(chat_id=chat_id).values()
     if not id_check.exists():
-        ModelUser.objects.create(chat_id=chat_id,address=address,phone_number=phone_number,comment=comment)
+        ModelUser.objects.create(chat_id=chat_id, address=address, phone_number=phone_number, comment=comment)
         instance = ModelUser.objects.filter(chat_id=chat_id).values()
         return Response(instance)
     else:
-        ModelUser.objects.update(chat_id=chat_id,address=address,phone_number=phone_number,comment=comment)
+        ModelUser.objects.update(chat_id=chat_id, address=address, phone_number=phone_number, comment=comment)
         instance = ModelUser.objects.filter(chat_id=chat_id).values()
         return Response(instance)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def createOrder(request):
+    chat_id = request.query_params['chat_id']
+    cart = request.query_params['cart']
+    free_delivery = request.query_params['free_delivery']
+    sum = request.query_params['sum']
+    address = request.query_params['address']
+    status = request.query_params['status']
+    comment = request.GET.get('comment')
+    a = ModelUser.objects.get(chat_id=chat_id)
+    if comment:
+        ModelOrder.objects.create(client=a,cart=cart,free_delivery=free_delivery,sum=sum,address=address,status=status,comment=comment)
+        instance = ModelOrder.objects.filter(client=a).only('client')
+        serializer = OrderSerializer(data={'client':chat_id,'cart':cart,'free_delivery':free_delivery,'sum':sum,'address':address,'status':status,'comment':comment},instance=instance[0])
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    else:
+        ModelOrder.objects.create(client=a,cart=cart,free_delivery=free_delivery,sum=sum,address=address,status=status)
+        instance = ModelOrder.objects.filter(client=a).only('client')
+        serializer = OrderSerializer(
+            data={'client': chat_id, 'cart': cart, 'free_delivery': free_delivery, 'sum': sum, 'address': address,
+                  'status': status, 'comment': comment}, instance=instance[0])
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def addItem(request):
