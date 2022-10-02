@@ -215,6 +215,14 @@ def changeStatus(request):
     status.update(status=new_status)
     return Response(status.values())
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def getOrder(request):
+    order_id = request.query_params['order_id']
+    order = ModelOrder.objects.filter(id=order_id).values()
+    return Response(order)
+
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
