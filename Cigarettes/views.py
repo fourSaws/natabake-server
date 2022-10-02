@@ -1,6 +1,6 @@
 import openpyxl
 from django.shortcuts import render
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -188,6 +188,7 @@ def createOrder(request):
     status = request.query_params['status']
     comment = request.GET.get('comment')
     a = ModelUser.objects.get(chat_id=chat_id)
+
     if comment:
         ModelOrder.objects.create(client=a,cart=cart,free_delivery=free_delivery,sum=sum,address=address,status=status,comment=comment)
         instance = ModelOrder.objects.filter(client=a).only('client')
@@ -221,6 +222,18 @@ def getOrder(request):
     order_id = request.query_params['order_id']
     order = ModelOrder.objects.filter(id=order_id).values()
     return Response(order)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+
+def getOrders(request):
+      chat_id = request.query_params['chat_id']
+      a = ModelUser.objects.get(chat_id=chat_id)
+      queryset = ModelOrder.objects.filter(client=a).only('client')
+      serializers = OrdersSerializer(queryset,many=True)
+      return Response(serializers.data)
+
 
 
 
