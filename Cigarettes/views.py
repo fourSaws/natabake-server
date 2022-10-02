@@ -206,6 +206,15 @@ def createOrder(request):
         return Response(serializer.data)
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def changeStatus(request):
+    order_id = request.query_params['order_id']
+    new_status = request.query_params['new_status']
+    status =  ModelOrder.objects.filter(id=order_id)
+    status.update(status=new_status)
+    return Response(status.values())
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

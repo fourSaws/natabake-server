@@ -2,7 +2,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
-from Cigarettes.views import mainPage, clearCart,getCart, editCart, getProducts, getBrands,addToCart,addItem,getCategory,getUser,createUser,createOrder
+from Cigarettes.views import mainPage, clearCart,getCart, editCart, getProducts, getBrands,addToCart,addItem,getCategory,getUser,createUser,createOrder,changeStatus
 
 #TODO:
 '''
@@ -29,6 +29,7 @@ urlpatterns = [
     path('api/getCategory',getCategory),
     path('api/getUser', getUser),
     path('api/createUser',createUser),
-    path('api/createOrder',createOrder)
+    path('api/createOrder',createOrder),
+    path('api/changeStatus',changeStatus)
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

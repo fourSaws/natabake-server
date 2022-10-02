@@ -41,8 +41,9 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ('id','chat_id','phone_number','address','comment',)
 
 
+
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('client','cart','free_delivery','sum','address','status','comment')
+    list_display = ('id','client','cart','free_delivery','sum','address','status','comment')
 
 admin.site.register(ModelProduct, MainProduct)
 admin.site.register(ModelCart, MainCart)
