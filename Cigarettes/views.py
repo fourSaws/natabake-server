@@ -1,9 +1,11 @@
 import openpyxl
 from django.shortcuts import render
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from Cigarettes.serializer import *
 from django.shortcuts import redirect
 
@@ -147,6 +149,92 @@ def addToCart(request):
     else:
         return Response({'Exception': 'Data invalid'}, status=status.HTTP_400_BAD_REQUEST)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def getUser(request):
+    chat_id = request.query_params['chat_id']
+    instance = ModelUser.objects.filter(chat_id=chat_id).values()
+    return Response(instance)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def createUser(request):
+    chat_id = request.query_params['chat_id']
+    phone_number = request.query_params['phone_number']
+    address = request.query_params['address']
+    comment = request.query_params['comment']
+    id_check = ModelUser.objects.filter(chat_id=chat_id).values()
+    if not id_check.exists():
+        ModelUser.objects.create(chat_id=chat_id, address=address, phone_number=phone_number, comment=comment)
+        instance = ModelUser.objects.filter(chat_id=chat_id).values()
+        return Response(instance)
+    else:
+        ModelUser.objects.update(chat_id=chat_id, address=address, phone_number=phone_number, comment=comment)
+        instance = ModelUser.objects.filter(chat_id=chat_id).values()
+        return Response(instance)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def createOrder(request):
+    chat_id = request.query_params['chat_id']
+    cart = request.query_params['cart']
+    free_delivery = request.query_params['free_delivery']
+    sum = request.query_params['sum']
+    address = request.query_params['address']
+    status = request.query_params['status']
+    comment = request.GET.get('comment')
+    a = ModelUser.objects.get(chat_id=chat_id)
+
+    if comment:
+        ModelOrder.objects.create(client=a,cart=cart,free_delivery=free_delivery,sum=sum,address=address,status=status,comment=comment)
+        instance = ModelOrder.objects.filter(client=a).only('client')
+        serializer = OrderSerializer(data={'client':chat_id,'cart':cart,'free_delivery':free_delivery,'sum':sum,'address':address,'status':status,'comment':comment},instance=instance[0])
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    else:
+        ModelOrder.objects.create(client=a,cart=cart,free_delivery=free_delivery,sum=sum,address=address,status=status)
+        instance = ModelOrder.objects.filter(client=a).only('client')
+        serializer = OrderSerializer(
+            data={'client': chat_id, 'cart': cart, 'free_delivery': free_delivery, 'sum': sum, 'address': address,
+                  'status': status, 'comment': comment}, instance=instance[0])
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def changeStatus(request):
+    order_id = request.query_params['order_id']
+    new_status = request.query_params['new_status']
+    status =  ModelOrder.objects.filter(id=order_id)
+    status.update(status=new_status)
+    return Response(status.values())
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def getOrder(request):
+    order_id = request.query_params['order_id']
+    order = ModelOrder.objects.filter(id=order_id).values()
+    return Response(order)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+
+def getOrders(request):
+      chat_id = request.query_params['chat_id']
+      a = ModelUser.objects.get(chat_id=chat_id)
+      queryset = ModelOrder.objects.filter(client=a).only('client')
+      serializers = OrdersSerializer(queryset,many=True)
+      return Response(serializers.data)
+
+
 
 
 @api_view(['GET'])

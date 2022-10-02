@@ -22,17 +22,19 @@ class ModelBrand(models.Model):
         return self.name
 
     class Meta:
-        verbose_name='Бренды'
+        verbose_name = 'Бренды'
         verbose_name_plural = 'Бренды'
 
 
 class ModelProduct(models.Model):
     name = models.CharField(max_length=255, null=True, verbose_name='Название')
     price = models.IntegerField(default=None, null=True, verbose_name='Цена')
-    brand = models.ForeignKey(blank=True, verbose_name='Бренд', to=ModelBrand, on_delete=models.CASCADE,related_name='brand_serializer')
-    photo_url = models.ImageField(default=None, verbose_name='Фото',blank=True)
-    volume = models.CharField(max_length=255,default=1,verbose_name='Кол-во',blank=True)
-    category = models.ForeignKey(to=ModelCategory,on_delete=models.CASCADE,default=None,null=True,verbose_name='Категория')
+    brand = models.ForeignKey(blank=True, verbose_name='Бренд', to=ModelBrand, on_delete=models.CASCADE,
+                              related_name='brand_serializer')
+    photo_url = models.ImageField(default=None, verbose_name='Фото', blank=True)
+    volume = models.CharField(max_length=255, default=1, verbose_name='Кол-во', blank=True)
+    category = models.ForeignKey(to=ModelCategory, on_delete=models.CASCADE, default=None, null=True,
+                                 verbose_name='Категория')
 
     class Meta:
         verbose_name = 'Каталог'
@@ -40,8 +42,6 @@ class ModelProduct(models.Model):
 
     def __str__(self):
         return f"{self.name}"
-
-
 
 
 class ModelCart(models.Model):
@@ -61,3 +61,45 @@ class ModelCart(models.Model):
     class Meta:
         verbose_name = 'Корзина'
         verbose_name_plural = 'Корзина'
+
+
+class ModelUser(models.Model):
+    chat_id = models.IntegerField(null=True, blank=True, verbose_name="Чат ID")
+    phone_number = models.CharField(max_length=11, verbose_name="Номер телефона")
+    address = models.CharField(max_length=255, verbose_name="Адрес")
+    comment = models.CharField(max_length=500, verbose_name="Комментарий")
+
+    def __str__(self):
+        return f"{self.chat_id}"
+
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+
+
+class ModelOrder(models.Model):
+    IN_CART = 'IN_CART'
+    WAITING_FOR_PAYMENT = 'WAITING_FOR_PAYMENT'
+    PAID = 'PAID'
+    CASH = 'CASH'
+    STATUS_CHOICES = [
+        (IN_CART, 'В корзине'),
+        (WAITING_FOR_PAYMENT, 'Ожидает оплаты'),
+        (PAID, 'Оплачено'),
+        (CASH, 'Наличные')
+    ]
+
+    client = models.ForeignKey('ModelUser', on_delete=models.CASCADE, verbose_name='Чат ID клиента')
+    cart = models.CharField(max_length=500, verbose_name='Корзина')
+    free_delivery = models.BooleanField(default=False, verbose_name='Бесплатная доставка')
+    sum = models.FloatField(null=True, verbose_name='Сумма')
+    address = models.CharField(max_length=255, verbose_name='Адрес')
+    status = models.CharField(choices=STATUS_CHOICES, max_length=255, verbose_name='Статус заказа')
+    comment = models.CharField(max_length=500, blank=True,null=True, verbose_name='Комментарий')
+
+    def __str__(self):
+        return f"{self.client}"
+
+    class Meta:
+        verbose_name = 'Заказ'
+        verbose_name_plural = 'Заказы'
