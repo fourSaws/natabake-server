@@ -15,8 +15,8 @@ class MainCart(admin.ModelAdmin):
 
 
 class MainProduct(admin.ModelAdmin):
-    list_display = ('id','category' ,'name', 'volume','brand', 'price','get_html_photo')
-    search_fields = ('name','category__name',)
+    list_display = ('id', 'category', 'name', 'volume', 'brand', 'price', 'get_html_photo')
+    search_fields = ('name', 'category__name',)
     list_display_links = ('name', 'id')
     readonly_fields = ['get_html_photo']
 
@@ -31,24 +31,19 @@ class MainProduct(admin.ModelAdmin):
 
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('id','name')
+    list_display = ('id', 'name')
 
 
 class BrandAdmin(admin.ModelAdmin):
-    list_display = ('id','name')
-
-class UserAdmin(admin.ModelAdmin):
-    list_display = ('id','chat_id','phone_number','address','comment',)
+    list_display = ('id', 'name')
 
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id','client','cart','free_delivery','sum','address','status','comment')
+    list_display = ('id', 'client', 'cart', 'free_delivery', 'sum', 'address', 'status', 'comment')
+
 
 admin.site.register(ModelProduct, MainProduct)
-admin.site.register(ModelCart, MainCart)
-admin.site.register(ModelCategory,CategoryAdmin)
-admin.site.register(ModelBrand,BrandAdmin)
-
-admin.site.register(ModelUser,UserAdmin)
-admin.site.register(ModelOrder,OrderAdmin)
+admin.site.register(ModelCategory, CategoryAdmin)
+admin.site.register(ModelBrand, BrandAdmin)
+admin.site.register(ModelOrder, OrderAdmin)

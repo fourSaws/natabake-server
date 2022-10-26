@@ -1,5 +1,10 @@
+import hashlib
+import os
+from uuid import uuid4
+
+from django.conf import settings
 from django.db import models
-from django.core.files.storage import default_storage
+from django.core.files.storage import default_storage, FileSystemStorage
 from django.db.models.signals import post_delete, pre_delete
 from django.dispatch import receiver
 
@@ -26,19 +31,26 @@ class ModelBrand(models.Model):
         verbose_name_plural = 'Бренды'
 
 
+class UUIDFileStorage(FileSystemStorage):
+    def get_available_name(self, name, max_length=None):
+        _, ext = os.path.splitext(name)
+        return uuid4().hex + ext
+
+
 class ModelProduct(models.Model):
     name = models.CharField(max_length=255, null=True, verbose_name='Название')
     price = models.IntegerField(default=None, null=True, verbose_name='Цена')
     brand = models.ForeignKey(blank=True, verbose_name='Бренд', to=ModelBrand, on_delete=models.CASCADE,
                               related_name='brand_serializer')
-    photo_url = models.ImageField(default=None, verbose_name='Фото', blank=True)
-    volume = models.CharField(max_length=255, default=1, verbose_name='Кол-во', blank=True)
+    photo_url = models.ImageField(default=None, upload_to='someimages', storage=UUIDFileStorage(), verbose_name='Фото',
+                                  blank=True)
+    volume = models.CharField(max_length=255, default=1, verbose_name='Объём/количество/размер', blank=True)
     category = models.ForeignKey(to=ModelCategory, on_delete=models.CASCADE, default=None, null=True,
                                  verbose_name='Категория')
 
     class Meta:
-        verbose_name = 'Каталог'
-        verbose_name_plural = 'Каталог'
+        verbose_name = 'Товар'
+        verbose_name_plural = 'Товары'
 
     def __str__(self):
         return f"{self.name}"
@@ -95,7 +107,7 @@ class ModelOrder(models.Model):
     sum = models.FloatField(null=True, verbose_name='Сумма')
     address = models.CharField(max_length=255, verbose_name='Адрес')
     status = models.CharField(choices=STATUS_CHOICES, max_length=255, verbose_name='Статус заказа')
-    comment = models.CharField(max_length=500, blank=True,null=True, verbose_name='Комментарий')
+    comment = models.CharField(max_length=500, blank=True, null=True, verbose_name='Комментарий')
 
     def __str__(self):
         return f"{self.client}"
