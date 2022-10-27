@@ -3,7 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from Cigarettes.views import mainPage, clearCart, getCart, editCart, getProducts, getBrands, addToCart, addItem, \
-    getCategory, getUser, createUser, createOrder, changeStatus,getOrder,getOrders
+    getCategory, getUser, createUser, createOrder, changeStatus, getOrder, getOrders
 
 # TODO:
 '''
@@ -31,7 +31,7 @@ urlpatterns = [
                   path('api/createUser', createUser),
                   path('api/createOrder', createOrder),
                   path('api/changeStatus', changeStatus),
-                  path('api/getOrder',getOrder),
-                  path('api/getOrders',getOrders)
+                  path('api/getOrder', getOrder),
+                  path('api/getOrders', getOrders)
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
