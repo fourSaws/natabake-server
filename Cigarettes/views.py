@@ -109,21 +109,19 @@ def getProducts(request):
     category = request.GET.get('category')
     id = request.GET.get('id')
     brand = request.GET.get('brand')
+    instance = ModelProduct.objects.all()
     if brand:
-        instance = ModelProduct.objects.filter(brand=brand).values()
-        return Response(instance)
+        instance = instance.filter(brand=brand)
     if name:
-        instance = ModelProduct.objects.filter(name=name).values()
-        return Response(instance)
+        instance = instance.filter(name=name)
     if id:
-        instance = ModelProduct.objects.filter(id=id).values()
-        return Response(instance)
+        instance = instance.filter(id=id)
     if category:
-        instance = ModelProduct.objects.filter(category=category).values()
-        return Response(instance)
+        instance = instance.filter(category=category)
+    instance = instance.values()
+    return Response(instance)
 
 
-@api_view(['GET'])
 @permission_classes([AllowAny])
 def addToCart(request):
     id_req = request.query_params['id']
