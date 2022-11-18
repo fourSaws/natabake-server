@@ -32,15 +32,21 @@ def getCart(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def getBrands(request):
-    instance = ModelBrand.objects.all().values()
-    return Response(instance)
+    all_brands = ModelBrand.objects.all().values()
+    arr = [all_brands[i]['id'] for i in range(len(all_brands))]
+    arr_true = [ModelBrand.objects.filter(id=i).values()[0] for i in arr if
+                ModelProduct.objects.filter(brand=i, show=True)]
+    return Response(arr_true)
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def getCategory(request):
-    instance = ModelCategory.objects.all().values()
-    return Response(instance)
+    all_cat = ModelCategory.objects.all().values()
+    arr = [all_cat[i]['id'] for i in range(len(all_cat))]
+    arr_true = [ModelCategory.objects.filter(id=i).values()[0] for i in arr if
+                ModelProduct.objects.filter(category=i, show=True)]
+    return Response(arr_true)
 
 
 @api_view(['GET'])
@@ -69,25 +75,12 @@ def editCart(request):
         _ = ModelCart.objects.filter(chat_id=chat_id).values('chat_id')[0]
     except IndexError:
         return Response({'Exception': 'Chat ID does not Exist'}, status=status.HTTP_404_NOT_FOUND)
-    same_rec = ModelCart.objects.filter(chat_id=chat_id)
+    same_rec = ModelCart.objects.filter(chat_id=chat_id, id=product)
     if quantity_req == "0":
-        _ = ModelCart.objects.filter(chat_id=chat_id).delete()
+        _ = ModelCart.objects.filter(chat_id=chat_id, id=product).delete()
         return Response({})
     if not same_rec.exists():
-        try:
-            a = ModelCart(quantity=int(quantity_req), chat_id=int(chat_id),
-                          product=ModelProduct.objects.get(id=product))
-        except ModelProduct.DoesNotExist:
-            return Response({"Exception": "ID not found in catalogue"}, status=status.HTTP_404_NOT_FOUND)
-        a.save()
-        a = ModelCart.objects.get(id=a.id)
-        serializer = CartSerializer(data={'chat_id': chat_id, 'quantity': quantity_req, 'product': product},
-                                    instance=a)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-        else:
-            return Response({'Exception': 'Data invalid'}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.data)
+        return Response({"Exception": "ID not found in cart"}, status=status.HTTP_404_NOT_FOUND)
     else:
         a = same_rec[0]
         same_rec[0].quantity = quantity_req
@@ -111,17 +104,18 @@ def getProducts(request):
     brand = request.GET.get('brand')
     instance = ModelProduct.objects.all()
     if brand:
-        instance = instance.filter(brand=brand)
+        instance = instance.filter(brand=brand, show=True)
     if name:
-        instance = instance.filter(name=name)
+        instance = instance.filter(name=name, show=True)
     if id:
-        instance = instance.filter(id=id)
+        instance = instance.filter(id=id, show=True)
     if category:
-        instance = instance.filter(category=category)
+        instance = instance.filter(category=category, show=True)
     instance = instance.values()
     return Response(instance)
 
 
+@api_view(['GET'])
 @permission_classes([AllowAny])
 def addToCart(request):
     id_req = request.query_params['id']
@@ -188,14 +182,18 @@ def createOrder(request):
     a = ModelUser.objects.get(chat_id=chat_id)
 
     if comment:
-        ModelOrder.objects.create(client=a,cart=cart,free_delivery=free_delivery,sum=sum,address=address,status=status,comment=comment)
+        ModelOrder.objects.create(client=a, cart=cart, free_delivery=free_delivery, sum=sum, address=address,
+                                  status=status, comment=comment)
         instance = ModelOrder.objects.filter(client=a).only('client')
-        serializer = OrderSerializer(data={'client':chat_id,'cart':cart,'free_delivery':free_delivery,'sum':sum,'address':address,'status':status,'comment':comment},instance=instance[0])
+        serializer = OrderSerializer(
+            data={'client': chat_id, 'cart': cart, 'free_delivery': free_delivery, 'sum': sum, 'address': address,
+                  'status': status, 'comment': comment}, instance=instance[0])
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
     else:
-        ModelOrder.objects.create(client=a,cart=cart,free_delivery=free_delivery,sum=sum,address=address,status=status)
+        ModelOrder.objects.create(client=a, cart=cart, free_delivery=free_delivery, sum=sum, address=address,
+                                  status=status)
         instance = ModelOrder.objects.filter(client=a).only('client')
         serializer = OrderSerializer(
             data={'client': chat_id, 'cart': cart, 'free_delivery': free_delivery, 'sum': sum, 'address': address,
@@ -210,9 +208,10 @@ def createOrder(request):
 def changeStatus(request):
     order_id = request.query_params['order_id']
     new_status = request.query_params['new_status']
-    status =  ModelOrder.objects.filter(id=order_id)
+    status = ModelOrder.objects.filter(id=order_id)
     status.update(status=new_status)
     return Response(status.values())
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -224,15 +223,12 @@ def getOrder(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-
 def getOrders(request):
-      chat_id = request.query_params['chat_id']
-      a = ModelUser.objects.get(chat_id=chat_id)
-      queryset = ModelOrder.objects.filter(client=a).only('client')
-      serializers = OrdersSerializer(queryset,many=True)
-      return Response(serializers.data)
-
-
+    chat_id = request.query_params['chat_id']
+    a = ModelUser.objects.get(chat_id=chat_id)
+    queryset = ModelOrder.objects.filter(client=a).only('client')
+    serializers = OrdersSerializer(queryset, many=True)
+    return Response(serializers.data)
 
 
 @api_view(['GET'])

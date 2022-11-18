@@ -47,6 +47,7 @@ class ModelProduct(models.Model):
     volume = models.CharField(max_length=255, default=1, verbose_name='Объём/количество/размер', blank=True)
     category = models.ForeignKey(to=ModelCategory, on_delete=models.CASCADE, default=None, null=True,
                                  verbose_name='Категория')
+    show = models.BooleanField(default=True,blank=True,null=True)
 
     class Meta:
         verbose_name = 'Товар'

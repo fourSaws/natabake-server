@@ -15,7 +15,7 @@ class MainCart(admin.ModelAdmin):
 
 
 class MainProduct(admin.ModelAdmin):
-    list_display = ('id', 'category', 'name', 'volume', 'brand', 'price', 'get_html_photo')
+    list_display = ('id', 'category', 'name', 'volume', 'brand', 'price', 'get_html_photo','show')
     search_fields = ('name', 'category__name',)
     list_display_links = ('name', 'id')
     readonly_fields = ['get_html_photo']
@@ -38,11 +38,15 @@ class BrandAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
 
 
+class CartAdmin(admin.ModelAdmin):
+    list_display = ('id', 'product', 'quantity', 'chat_id')
+
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('id', 'client', 'cart', 'free_delivery', 'sum', 'address', 'status', 'comment')
 
 
+admin.site.register(ModelCart, CartAdmin)
 admin.site.register(ModelProduct, MainProduct)
 admin.site.register(ModelCategory, CategoryAdmin)
 admin.site.register(ModelBrand, BrandAdmin)
