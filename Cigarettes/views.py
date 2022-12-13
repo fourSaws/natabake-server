@@ -9,6 +9,14 @@ from rest_framework.views import APIView
 from Cigarettes.serializer import *
 from django.shortcuts import redirect
 
+@api_view(['GET','POST'])
+@permission_classes([AllowAny])
+def payment_notification(request):
+    with open('notification.json','w') as file:
+        file.write(str(request.headers.values()))
+        file.write('/n')
+        file.write(str(request.data))
+    return Response('OK')
 
 
 def mainPage(request):
