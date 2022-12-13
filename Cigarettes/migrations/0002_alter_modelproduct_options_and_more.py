@@ -7,22 +7,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Cigarettes', '0001_initial'),
+        ("Cigarettes", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='modelproduct',
-            options={'verbose_name': 'Товар', 'verbose_name_plural': 'Товары'},
+            name="modelproduct",
+            options={"verbose_name": "Товар", "verbose_name_plural": "Товары"},
         ),
         migrations.AlterField(
-            model_name='modelproduct',
-            name='photo_url',
-            field=models.ImageField(blank=True, default=None, storage=Cigarettes.models.UUIDFileStorage(), upload_to='someimages', verbose_name='Фото'),
+            model_name="modelproduct",
+            name="photo_url",
+            field=models.ImageField(
+                blank=True,
+                default=None,
+                storage=Cigarettes.models.UUIDFileStorage(),
+                upload_to="someimages",
+                verbose_name="Фото",
+            ),
         ),
         migrations.AlterField(
-            model_name='modelproduct',
-            name='volume',
-            field=models.CharField(blank=True, default=1, max_length=255, verbose_name='Объём/количество/размер'),
+            model_name="modelproduct",
+            name="volume",
+            field=models.CharField(blank=True, default=1, max_length=255, verbose_name="Объём/количество/размер"),
         ),
     ]

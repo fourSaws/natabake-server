@@ -4,22 +4,39 @@ from Cigarettes.models import *
 
 class CategorySerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=255)
+
     class Meta:
         model = ModelCategory
-        fields = ('__all__')
+        fields = "__all__"
 
 
 class ForGetProductSerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(slug_field='name',read_only=True)
-    brand = serializers.SlugRelatedField(slug_field='id', read_only=True)
+    category = serializers.SlugRelatedField(slug_field="name", read_only=True)
+    brand = serializers.SlugRelatedField(slug_field="id", read_only=True)
+
     class Meta:
         model = ModelProduct
-        fields = ('id', 'name', 'brand', 'price','category','volume',)
+        fields = (
+            "id",
+            "name",
+            "brand",
+            "price",
+            "category",
+            "volume",
+        )
+
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = ModelProduct
-        fields = ('id', 'name', 'brand', 'price','category','volume',)
+        fields = (
+            "id",
+            "name",
+            "brand",
+            "price",
+            "category",
+            "volume",
+        )
 
 
 class CartSerializer(serializers.ModelSerializer):
@@ -29,7 +46,7 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ModelCart
-        fields = ('product', 'quantity', 'chat_id')
+        fields = ("product", "quantity", "chat_id")
 
 
 # class UserSerializer(serializers.ModelSerializer):
@@ -37,20 +54,24 @@ class CartSerializer(serializers.ModelSerializer):
 #         model = ModelUser
 #         fields = ('__all__')
 
+
 class OrderSerializer(serializers.ModelSerializer):
-    client = serializers.SlugRelatedField(slug_field='chat_id',read_only=True)
+    client = serializers.SlugRelatedField(slug_field="chat_id", read_only=True)
+
     class Meta:
         model = ModelOrder
-        fields = ('client','cart','free_delivery','sum','address','status','comment')
+        fields = ("client", "cart", "free_delivery", "sum", "address", "status", "comment")
 
 
 class OrdersSerializer(serializers.ModelSerializer):
     client = serializers.StringRelatedField()
+
     class Meta:
         model = ModelOrder
-        fields = '__all__'
+        fields = "__all__"
+
 
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = ModelProduct
-        fields = ('brand',)
+        fields = ("brand",)
