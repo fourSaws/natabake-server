@@ -125,16 +125,6 @@ def payment_notification(request):
     return Response("OK", status=status.HTTP_200_OK)
 
 
-@api_view(["GET", "POST"])
-@permission_classes([AllowAny])
-def payment_notification(request):
-    with open("notification.json", "w") as file:
-        file.write(str(request.headers.values()))
-        file.write("/n")
-        file.write(str(request.data))
-    return Response("OK")
-
-
 def mainPage(request):
     return redirect("/admin/")
 
