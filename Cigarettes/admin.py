@@ -14,11 +14,22 @@ class MainCart(admin.ModelAdmin):
     get_sum.short_description = 'Сумма'
 
 
+@admin.action(description='Скрыть в боте')
+def add_to_arch(modeladmin, request, queryset):
+    queryset.update(show=False)
+
+
+@admin.action(description='Показывать в боте')
+def remove_from_arch(modeladmin, request, queryset):
+    queryset.update(show=True)
+
+
 class MainProduct(admin.ModelAdmin):
-    list_display = ('id', 'category', 'name', 'volume', 'brand', 'price', 'get_html_photo')
-    search_fields = ('name', 'category__name',)
+    list_display = ('id', 'category', 'name', 'volume', 'brand', 'price', 'get_html_photo', 'show')
+    search_fields = ('name', 'category__name','brand__name')
     list_display_links = ('name', 'id')
     readonly_fields = ['get_html_photo']
+    actions = [add_to_arch, remove_from_arch]
 
     def get_html_photo(self, obj):
         if obj.photo_url:
@@ -38,12 +49,17 @@ class BrandAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
 
 
+class CartAdmin(admin.ModelAdmin):
+    list_display = ('id', 'product', 'quantity', 'chat_id')
+
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('id', 'client', 'cart', 'free_delivery', 'sum', 'address', 'status', 'comment')
 
 
+admin.site.register(ModelCart, CartAdmin)
 admin.site.register(ModelProduct, MainProduct)
 admin.site.register(ModelCategory, CategoryAdmin)
 admin.site.register(ModelBrand, BrandAdmin)
 admin.site.register(ModelOrder, OrderAdmin)
+
