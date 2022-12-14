@@ -60,7 +60,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ModelOrder
-        fields = ("client", "cart", "free_delivery", "sum", "address", "status", "comment")
+        fields = ("id", "client", "cart", "free_delivery", "sum", "address", "status", "comment")
 
 
 class OrdersSerializer(serializers.ModelSerializer):
@@ -68,6 +68,12 @@ class OrdersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ModelOrder
+        fields = "__all__"
+
+
+class ClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ModelUser
         fields = "__all__"
 
 
