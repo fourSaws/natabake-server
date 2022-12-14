@@ -8,13 +8,26 @@ from hashlib import sha256
 from hmac import new
 from os import environ
 from telebot import TeleBot
-
+import logging
 from Cigarettes.serializer import *
 from django.shortcuts import redirect
+
+logger = logging.getLogger(__name__)
+
+def print_event(func):
+    def wrapper(*args, **kwargs):
+        logger.info(f"RAW AGRS: {args.data}")
+        result = func(*args, **kwargs)
+        logger.info(f"RESPONSE:{result.data}")
+        return result
+    return wrapper
+
+
 
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@print_event
 def payment_notification(request):
     signature = request.headers.get("X-Api-Signature-Sha256")
     if "bill" not in request.POST:
@@ -30,6 +43,7 @@ def payment_notification(request):
         "creationDateTime",
         "expirationDateTime",
     ) not in request.POST.get("bill"):
+        print("Incorrect post data")
         return Response("Incorrect post data", status=status.HTTP_400_BAD_REQUEST)
     currency = request.data.get("bill").get("amount").get("currency")
     amount = request.data.get("bill").get("amount").get("value")

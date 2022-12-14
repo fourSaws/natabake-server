@@ -25,8 +25,7 @@ SECRET_KEY = "django-insecure-$6wa&b!^$hm%v+1-2+sfzr7&@a&p(h=eyj$m-tw94^pv&khauq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["1044177-cl26955.tmweb.ru", "127.0.0.1"]
-
+ALLOWED_HOSTS = ["1044177-cl26955.tmweb.ru", "127.0.0.1","185.104.114.150"]
 # Application definition
 
 INSTALLED_APPS = [
@@ -124,3 +123,30 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'django.log',
+        },
+        'myFile': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'QIWI.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        '':{
+           'level':'INFO',
+           'handlers':['myFile']
+        }
+    },
+}
