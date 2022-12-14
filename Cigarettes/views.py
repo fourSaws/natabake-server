@@ -80,7 +80,7 @@ def payment_notification(request):
         return Response("OK", status=status.HTTP_200_OK)
     if payment_status == "PAID":
         assert float(amount) == order.sum
-        order.status = "Оплачено"
+        order.status = "PAID"
         order.save()
         try:
             bot.send_message(request.data.get("bill").get("customer").get("account"), f"Заказ {bill_id} оплачен!")
@@ -288,13 +288,16 @@ def createUser(request):
     comment = request.query_params["comment"]
     id_check = ModelUser.objects.filter(chat_id=chat_id).values()
     if not id_check.exists():
-        ModelUser.objects.create(chat_id=chat_id, address=address, phone_number=phone_number, comment=comment)
-        instance = ModelUser.objects.filter(chat_id=chat_id).values()
-        return Response(instance)
+        instance = ModelUser.objects.create(chat_id=chat_id, address=address, phone_number=phone_number, comment=comment)
+        instance.save()
     else:
-        ModelUser.objects.update(chat_id=chat_id, address=address, phone_number=phone_number, comment=comment)
-        instance = ModelUser.objects.filter(chat_id=chat_id).values()
-        return Response(instance)
+        instance = ModelUser.objects.get(chat_id=chat_id)
+        instance.chat_id = chat_id
+        instance.address = address
+        instance.phone_number = phone_number
+        instance.comment = comment
+        instance.save()
+    return Response(ModelUser.objects.filter(chat_id=chat_id).values())
 
 
 @api_view(["GET"])
@@ -310,9 +313,10 @@ def createOrder(request):
     a = ModelUser.objects.get(chat_id=chat_id)
 
     if comment:
-        ModelOrder.objects.create(
+        instance_ = ModelOrder.objects.create(
             client=a, cart=cart, free_delivery=free_delivery, sum=sum, address=address, status=status, comment=comment
         )
+        instance_.save()
         instance = ModelOrder.objects.filter(client=a).only("client")
         serializer = OrderSerializer(
             data={
@@ -323,6 +327,7 @@ def createOrder(request):
                 "address": address,
                 "status": status,
                 "comment": comment,
+                "id": instance_.id,
             },
             instance=instance[0],
         )
@@ -330,7 +335,10 @@ def createOrder(request):
         serializer.save()
         return Response(serializer.data)
     else:
-        ModelOrder.objects.create(client=a, cart=cart, free_delivery=free_delivery, sum=sum, address=address, status=status)
+        instance_ = ModelOrder.objects.create(
+            client=a, cart=cart, free_delivery=free_delivery, sum=sum, address=address, status=status
+        )
+        instance_.save()
         instance = ModelOrder.objects.filter(client=a).only("client")
         serializer = OrderSerializer(
             data={
@@ -341,6 +349,7 @@ def createOrder(request):
                 "address": address,
                 "status": status,
                 "comment": comment,
+                "id": instance_.id,
             },
             instance=instance[0],
         )
