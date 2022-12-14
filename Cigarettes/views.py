@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 def print_event(func):
     def wrapper(*args, **kwargs):
-        logger.info(f"RAW AGRS: {args.data}")
+        logger.info(f"RAW AGRS: {args[0].data}")
         result = func(*args, **kwargs)
         logger.info(f"RESPONSE:{result.data}")
         return result
@@ -30,9 +30,17 @@ def print_event(func):
 @print_event
 def payment_notification(request):
     signature = request.headers.get("X-Api-Signature-Sha256")
-    if "bill" not in request.POST:
+    with open('notification.txt','w') as file:
+         file.write("header\n")
+         file.write(str(request.headers))
+         file.write("body")
+         file.write(str(request.POST))
+
+    if "bill" not in request.data:
+        logger.info("not found bill")
+        logger.info(f"first level keys is {request.data}")
         return Response("Incorrect post data", status=status.HTTP_400_BAD_REQUEST)
-    if (
+    for i in  (
         "siteId",
         "billId",
         "amount",
@@ -42,18 +50,20 @@ def payment_notification(request):
         "comment",
         "creationDateTime",
         "expirationDateTime",
-    ) not in request.POST.get("bill"):
-        print("Incorrect post data")
-        return Response("Incorrect post data", status=status.HTTP_400_BAD_REQUEST)
+    ):
+        if i not in request.data.get("bill").keys():
+            logger.info(f"{i} not in bill")
+            return Response("Incorrect post data", status=status.HTTP_400_BAD_REQUEST)
     currency = request.data.get("bill").get("amount").get("currency")
     amount = request.data.get("bill").get("amount").get("value")
     bill_id = request.data.get("bill").get("billId")
     site_id = request.data.get("bill").get("siteId")
     payment_status = request.data.get("bill").get("status").get("value")
     if not all((currency, amount, bill_id, site_id, payment_status)):
+        logger.info("dropped on 2nd")
         return Response("Incorrect post data", status=status.HTTP_400_BAD_REQUEST)
     message = "|".join((currency, amount, bill_id, site_id, payment_status))
-    my_signature = new(environ["qiwi_secret"].encode(), msg=message, digestmod=sha256).hexdigest()
+    my_signature = new(environ["qiwi_secret"].encode(), msg=message.encode(), digestmod=sha256).hexdigest()
     if my_signature != request.headers.get("X-Api-Signature-Sha256"):
         return Response("Wrong signature", status=status.HTTP_403_FORBIDDEN)
     bot = TeleBot(environ["teletoken"])
@@ -67,7 +77,7 @@ def payment_notification(request):
                 bot.send_message(chat_id, "Ошибка во время оплаты, информация передана администрации")
             except Exception:
                 pass
-        with open("../../natabake-bot/chats.txt") as file:
+        with open("/root/natabake-bot/chats.txt") as file:
             for admin_chat_id in file.readlines():
                 admin_chat_id = int(admin_chat_id[:-1])
                 try:
@@ -113,28 +123,31 @@ def payment_notification(request):
                 username = username.replace(char, "\\" + char)
             if phone_number:
                 phone_number = phone_number.replace(char, "\\" + char)
-            order.cart = order.cart.replace(char, "\\" + char)
-            order.address = order.address.replace("\n", "\n\t\t")
-
+        order.address = order.address.replace("\n", "\n\t\t")
+        valid_sum=str(order.sum).replace('.','\\.')
         notification_text = f"""
-        *Новый заказ*
-        {order.cart}
-        *Итого: {order.sum}₽*
-        Телефон: \\{phone_number} \\({"@" + username if username else "No nickname"}\\)
-        Адрес:
-        \t\t{order.address}
+*Новый заказ*
+{order.cart}
+*Итого: {valid_sum}₽*
+Телефон: {phone_number} \\({"@" + username if username else "No nickname"}\\)
+Адрес:
+\t{order.address}
 
-        Заказ оплачен *__Картой__*
+Заказ оплачен *__Картой__*
             """
-        with open("../../natabake-bot/chats.txt") as file:
-            for admin_chat_id in file.readlines():
+        with open("/root/natabake-bot/chats.txt") as file:
+            content=file.readlines()
+            logger.info(f"chats.txt={content}")
+            for admin_chat_id in content:
                 admin_chat_id = int(admin_chat_id[:-1])
+                logger.info(f"Sending to {admin_chat_id}")
                 try:
                     TeleBot(environ["notification_token"]).send_message(
                         admin_chat_id, notification_text, parse_mode="MarkdownV2"
                     )
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.info(f"Exception when sent to {admin_chat_id} {exc}")
+                    logger.info(f"{notification_text=}")
 
     return Response("OK", status=status.HTTP_200_OK)
 
