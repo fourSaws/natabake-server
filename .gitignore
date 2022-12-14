@@ -2,8 +2,11 @@
 __pycache__/
 *.py[cod]
 *$py.class
+static/
+notification.json
+restart.sh
 media/
-
+db.sqlite3
 # C extensions
 *.so
 
