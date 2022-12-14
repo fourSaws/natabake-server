@@ -303,59 +303,26 @@ def createUser(request):
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def createOrder(request):
-    chat_id = request.query_params["chat_id"]
+    chat_id = int(request.query_params["chat_id"])
     cart = request.query_params["cart"]
     free_delivery = request.query_params["free_delivery"]
-    sum = request.query_params["sum"]
+    sum_ = request.query_params["sum"]
     address = request.query_params["address"]
-    status = request.query_params["status"]
+    status_ = request.query_params["status"]
     comment = request.GET.get("comment")
-    a = ModelUser.objects.get(chat_id=chat_id)
+    user = ModelUser.objects.get(chat_id=chat_id)
 
     if comment:
-        instance_ = ModelOrder.objects.create(
-            client=a, cart=cart, free_delivery=free_delivery, sum=sum, address=address, status=status, comment=comment
+        instance = ModelOrder.objects.create(
+            client=user, cart=cart, free_delivery=free_delivery, sum=sum_, address=address, status=status_, comment=comment
         )
-        instance_.save()
-        instance = ModelOrder.objects.filter(client=a).only("client")
-        serializer = OrderSerializer(
-            data={
-                "client": chat_id,
-                "cart": cart,
-                "free_delivery": free_delivery,
-                "sum": sum,
-                "address": address,
-                "status": status,
-                "comment": comment,
-                "id": instance_.id,
-            },
-            instance=instance[0],
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
     else:
-        instance_ = ModelOrder.objects.create(
-            client=a, cart=cart, free_delivery=free_delivery, sum=sum, address=address, status=status
+        instance = ModelOrder.objects.create(
+            client=user, cart=cart, free_delivery=free_delivery, sum=sum_, address=address, status=status_
         )
-        instance_.save()
-        instance = ModelOrder.objects.filter(client=a).only("client")
-        serializer = OrderSerializer(
-            data={
-                "client": chat_id,
-                "cart": cart,
-                "free_delivery": free_delivery,
-                "sum": sum,
-                "address": address,
-                "status": status,
-                "comment": comment,
-                "id": instance_.id,
-            },
-            instance=instance[0],
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+    instance.save()
+    instance=ModelOrder.objects.filter(id=instance.id)
+    return Response(instance.values())
 
 
 @api_view(["GET"])
