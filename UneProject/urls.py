@@ -17,7 +17,7 @@ from UneApplication.views import (
     createOrder,
     changeStatus,
     getOrder,
-    getOrders,
+    getOrders, searchByName,
     # payment_notification,
 )
 
@@ -33,21 +33,22 @@ getCategories()->list[str]
 """
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("", mainPage),
-    path("api/getCart", getCart),
-    path("api/clearCart", clearCart),
-    path("api/editCart", editCart),
-    path("api/getProducts", getProducts),
-    path("api/getBrands", getBrands),
-    path("api/addToCart", addToCart),
-    path("api/addItem", addItem),
-    path("api/getCategory", getCategory),
-    path("api/getUser", getUser),
-    path("api/createUser", createUser),
-    path("api/createOrder", createOrder),
-    path("api/changeStatus", changeStatus),
-    path("api/getOrder", getOrder),
-    path("api/getOrders", getOrders),
-    # path("payment_notification", payment_notification),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+                  path("admin/", admin.site.urls),
+                  path("", mainPage),
+                  path("api/getCart", getCart),
+                  path("api/clearCart", clearCart),
+                  path("api/editCart", editCart),
+                  path("api/getProducts", getProducts),
+                  path("api/getBrands", getBrands),
+                  path("api/addToCart", addToCart),
+                  path("api/addItem", addItem),
+                  path("api/getCategory", getCategory),
+                  path("api/getUser", getUser),
+                  path("api/createUser", createUser),
+                  path("api/createOrder", createOrder),
+                  path("api/changeStatus", changeStatus),
+                  path("api/getOrder", getOrder),
+                  path("api/getOrders", getOrders),
+                  path("api/search", searchByName.as_view())
+                  # path("payment_notification", payment_notification),
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

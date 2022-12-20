@@ -21,7 +21,7 @@ class ModelCategory(models.Model):
 
 
 class ModelBrand(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255,verbose_name="Бренд")
 
     def __str__(self):
         return self.name

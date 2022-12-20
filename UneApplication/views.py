@@ -1,4 +1,5 @@
 import openpyxl
+from django.db.models import Q
 from django.shortcuts import render
 from rest_framework import status, generics
 from rest_framework.decorators import api_view, permission_classes
@@ -9,10 +10,14 @@ from rest_framework.response import Response
 # from os import environ
 # from telebot import TeleBot
 import logging
+
+from rest_framework.views import APIView
+
 from UneApplication.serializer import *
 from django.shortcuts import redirect
 
 logger = logging.getLogger(__name__)
+
 
 # def print_event(func):
 #     def wrapper(*args, **kwargs):
@@ -21,8 +26,6 @@ logger = logging.getLogger(__name__)
 #         logger.info(f"RESPONSE:{result.data}")
 #         return result
 #     return wrapper
-
-
 
 
 # @api_view(["POST"])
@@ -176,7 +179,8 @@ def getCart(request):
 def getBrands(request):
     all_brands = ModelBrand.objects.all().values()
     arr = [all_brands[i]["id"] for i in range(len(all_brands))]
-    arr_true = [ModelBrand.objects.filter(id=i).values()[0] for i in arr if ModelProduct.objects.filter(brand=i, show=True)]
+    arr_true = [ModelBrand.objects.filter(id=i).values()[0] for i in arr if
+                ModelProduct.objects.filter(brand=i, show=True)]
     return Response(arr_true)
 
 
@@ -186,9 +190,19 @@ def getCategory(request):
     all_cat = ModelCategory.objects.all().values()
     arr = [all_cat[i]["id"] for i in range(len(all_cat))]
     arr_true = [
-        ModelCategory.objects.filter(id=i).values()[0] for i in arr if ModelProduct.objects.filter(category=i, show=True)
+        ModelCategory.objects.filter(id=i).values()[0] for i in arr if
+        ModelProduct.objects.filter(category=i, show=True)
     ]
     return Response(arr_true)
+
+
+class searchByName(APIView):
+    def get(self, request):
+        query = self.request.query_params.get('query')
+        instance = ModelProduct.objects.filter(
+            Q(name__icontains=query) | Q(brand__name__icontains=query) | Q(category__name__icontains=query) | Q(
+                volume__icontains=query))
+        return Response(instance.values())
 
 
 @api_view(["GET"])
@@ -301,7 +315,8 @@ def createUser(request):
     comment = request.query_params["comment"]
     id_check = ModelUser.objects.filter(chat_id=chat_id).values()
     if not id_check.exists():
-        instance = ModelUser.objects.create(chat_id=chat_id, address=address, phone_number=phone_number, comment=comment)
+        instance = ModelUser.objects.create(chat_id=chat_id, address=address, phone_number=phone_number,
+                                            comment=comment)
         instance.save()
     else:
         instance = ModelUser.objects.get(chat_id=chat_id)
@@ -327,14 +342,15 @@ def createOrder(request):
 
     if comment:
         instance = ModelOrder.objects.create(
-            client=user, cart=cart, free_delivery=free_delivery, sum=sum_, address=address, status=status_, comment=comment
+            client=user, cart=cart, free_delivery=free_delivery, sum=sum_, address=address, status=status_,
+            comment=comment
         )
     else:
         instance = ModelOrder.objects.create(
             client=user, cart=cart, free_delivery=free_delivery, sum=sum_, address=address, status=status_
         )
     instance.save()
-    instance=ModelOrder.objects.filter(id=instance.id)
+    instance = ModelOrder.objects.filter(id=instance.id)
     return Response(instance.values())
 
 
@@ -422,7 +438,7 @@ def addItem(request):
             for index, word in enumerate(sheet["D" + str(i)].value.split()[::-1]):
                 if word.isdigit():
                     name = " ".join(sheet["D" + str(i)].value.split()[: -(index + 1)])
-                    current_volume = " ".join(sheet["D" + str(i)].value.split()[-(index + 1) :])
+                    current_volume = " ".join(sheet["D" + str(i)].value.split()[-(index + 1):])
                     break
             category = sheet["N" + str(2)].value
             price = sheet["H" + str(i)].value
@@ -472,7 +488,7 @@ def addItem(request):
                         #     f"D{row} name={' '.join(sheet['D' + str(row)].value.split()[:-(index + 1)])}\tcurrent_vol={' '.join(sheet['D' + str(row)].value.split()[-(index + 1):])}")
 
                         name = " ".join(sheet["D" + str(row)].value.split()[: -(index + 1)])
-                        current_volume = " ".join(sheet["D" + str(row)].value.split()[-(index + 1) :])
+                        current_volume = " ".join(sheet["D" + str(row)].value.split()[-(index + 1):])
 
                         break
             except AttributeError as e:
