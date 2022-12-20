@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("Cigarettes", "0002_alter_modelproduct_options_and_more"),
+        ("UneApplication", "0002_alter_modelproduct_options_and_more"),
     ]
 
     operations = [
